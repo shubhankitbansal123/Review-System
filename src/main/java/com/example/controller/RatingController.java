@@ -1,35 +1,46 @@
 package com.example.controller;
 
 import com.example.models.Rating;
+import com.example.models.RatingAverage;
 import com.example.repository.HotelRepository;
 import com.example.repository.RatingRepository;
 import com.example.repository.UsersRepository;
+import com.example.service.HotelService;
+import com.example.service.RatingService;
+import com.example.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class RatingController {
 
     @Autowired
-    private RatingRepository ratingRepository;
+    private RatingService ratingService;
 
     @Autowired
-    private UsersRepository usersRepository;
+    private UserService userService;
 
     @Autowired
-    private HotelRepository hotelRepository;
+    private HotelService hotelService;
 
     @PostMapping("/rateHotel")
-    public String rateHotel(@RequestBody Rating rating, @RequestHeader("access_token") String accessToken){
-        Integer count = usersRepository.checkUser(accessToken,rating.getUser_id());
-        Integer count1 = hotelRepository.getHotelCount(rating.getHotel_id());
-        if(count==0 || count1==0){
-            return "Invalid request";
+    public String rateHotel(@RequestBody Rating rating, @RequestHeader("user_token") String userToken){
+        boolean count = userService.checkUser(userToken,rating.getUser_id(),rating.getType());
+        if(!count){
+            return "Invalid Request";
         }
-        ratingRepository.save(rating);
+        if(rating.getType().equalsIgnoreCase("Hotel")) {
+            boolean count1 = hotelService.getHotelCount(rating.getType_id());
+            if (!count1) {
+                return "Invalid request";
+            }
+        }
+        ratingService.save(rating);
         return "rating added successfully";
+    }
+
+    @GetMapping("/averageRating")
+    public RatingAverage ratingAverage(){
+        return ratingService.ratingAverage();
     }
 }

@@ -1,86 +1,103 @@
 package com.example.controller;
 
+
 import com.example.models.UserInfo;
 import com.example.models.Users;
-import com.example.repository.UsersRepository;
+
+import com.example.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
-import javax.websocket.server.PathParam;
 import java.util.UUID;
 
 @RestController
 public class UserController {
 
     @Autowired
-    private UsersRepository usersRepository;
+    private UserService userService;
 
-    @PostMapping("/signUp") // Everybody access and create user with unique emailId
+    @PostMapping("/signUp")// Everybody access and create user with unique emailId
     public String createUser(@RequestBody Users users){
 
-        if(StringUtils.isEmpty(users.getEmail())) {
-            return "Email is required";
-        }
-        if(StringUtils.isEmpty(users.getType())){
-            return "Type is required";
+        if(StringUtils.isEmpty(users.getEmail()) || StringUtils.isEmpty(users.getType()) || StringUtils.isEmpty(users.is_admin()) || StringUtils.isEmpty(users.getUsername())) {
+            return "Some fields are missing";
         }
         if(!users.getType().equalsIgnoreCase("Hotel") && StringUtils.isEmpty(users.getPassword())){
             return "For " +users.getType()+" password is necessary";
         }
-        Integer isUserExist = usersRepository.userAlreadyExist(users.getEmail());
-        if(isUserExist==1){
+        boolean isUserExist = userService.isUserAlreadyExist(users.getEmail());
+        if(isUserExist){
             return "User Already Exist";
         }
         else {
             String userToken = UUID.randomUUID().toString();
-            users.setAccess_token(userToken);
-            usersRepository.save(users);
-            return "Hello " + users.getUsername() + "\nUser Token : " + users.getAccess_token();
+            users.setUsertoken(userToken);
+            userService.save(users,userToken);
+            return "Hello " + users.getUsername() + "\nUser Token : " + users.getUsertoken();
         }
     }
 
-    @GetMapping("/signIn")  // Everybody signIn with correct emailId and password
+    @PostMapping("/signIn")  // Everybody signIn with correct emailId and password
     public String signIn(@RequestBody Users users){
-        Integer islegitUser = usersRepository.legitUser(users.getEmail());
-        if(islegitUser==0){
-            return "User does not Exist";
+        Users users1 = userService.getUserByEmail(users.getEmail());
+        if(users1==null){
+            return "User does not exist";
+        }
+        else if(!StringUtils.isEmpty(users1.getUsertoken())){
+            return "User already signed in";
         }
         else {
-            String getToken = usersRepository.getAccessToken(users.getEmail());
-            return getToken;
+            String userToken = UUID.randomUUID().toString();
+            users1.setUsertoken(userToken);
+            System.out.println(users1.toString());
+            try {
+                userService.save(users1,userToken);
+            }catch (Exception e){
+                e.printStackTrace();
+                return "Update Unsuccessful";
+            }
+            return userToken;
         }
     }
     
     @GetMapping("/userInfo")
-    public UserInfo userInfo(@RequestHeader("access_token") String accessToken){
-        System.out.println("userInfo");
-        Users users = usersRepository.getUserInfo(accessToken);
+    public UserInfo userInfo(@RequestHeader("user_token") String userToken){
+        System.out.println("in user info");
+        Users users =userService.getUserInfo(userToken);
         UserInfo userInfo = new UserInfo(users.getEmail(),users.getUsername(),users.is_admin());
         return userInfo;
     }
 
     @DeleteMapping("/deleteUser")     // it gives an error
-    public String deleteUser(@RequestHeader("access_token") String accessToken){
-        System.out.println("deleteUser");
-        usersRepository.deleteUser(accessToken);
-        return "Delete Successfully";
+    public String deleteUser(@RequestHeader("user_token") String userToken){
+        try{
+            if(userService.deleteUser(userToken)!=null)
+                return "Delete Successfully";
+            else
+                return "Deleted Unsuccessful";
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+
     }
 
-    @DeleteMapping("/deleteUserByAdmin/{email}")  // delete user by admin
-    public String deleteUserByAdmin(@RequestHeader("access_token") String accessToken,@PathVariable String email){
-        Integer count1 = usersRepository.legitUser(email);
-        if(count1==0){
+    @DeleteMapping("/deleteUserByAdmin")  // delete user by admin
+    public String deleteUserByAdmin(@RequestHeader("user_token") String userToken,@RequestParam("email") String email){
+        String  userToken1 = userService.getUserTokenByEmail(email);
+        if(userToken1==null){
             return "user does not exist";
         }
-        usersRepository.deleteUserByEmail(email); // work fine but shown give error for no results were returned by the query
-        return null;
+        userService.deleteUser(userToken1); // work fine but shown give error for no results were returned by the query
+        return "Deleted Successfully";
     }
 
-
-
-
-
-
-
+    @DeleteMapping("/logout")
+    public String logout(@RequestHeader("user_token") String userToken){
+        userService.logout(userToken);
+        return "Log out Successful";
+    }
 }

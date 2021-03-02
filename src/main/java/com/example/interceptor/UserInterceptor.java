@@ -1,9 +1,13 @@
 package com.example.interceptor;
 
 
+import com.example.models.Users;
 import com.example.repository.UsersRepository;
+import com.example.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
@@ -13,16 +17,21 @@ import javax.servlet.http.HttpServletResponse;
 public class UserInterceptor implements HandlerInterceptor {
 
     @Autowired
-    private UsersRepository usersRepository;
+    private UserService userService;
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        if(request.getHeader("access_token").isEmpty()){
+        if(StringUtils.isEmpty(request.getHeader("user_token"))){
             return false;
         }
-        String accessToken = request.getHeader("access_token");
-        if(usersRepository.checkAccessToken(accessToken)==0){
+        String userToken = request.getHeader("user_token");
+        Users users = userService.getUserInfo(userToken);
+
+        if(users==null){
+            System.out.println("User does not exist");
             return false;
         }
+        System.out.println("in interceptor");
         return true;
     }
 }

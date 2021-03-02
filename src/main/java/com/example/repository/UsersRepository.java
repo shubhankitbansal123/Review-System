@@ -1,47 +1,61 @@
 package com.example.repository;
 
-import com.example.models.Rating;
 import com.example.models.Users;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import javax.transaction.Transactional;
 
 
 @Repository
 public interface UsersRepository extends JpaRepository<Users,String> {
 
-    @Query(value = "select count(*) from users where email=?1",nativeQuery = true)
-    public Integer userAlreadyExist(String email);
+    @Query(value = "select case when exists(select * from users where email=?1) then true else false end",nativeQuery = true)
+    boolean userAlreadyExist(String email);
 
-    @Query(value = "select count(*) from users where email=?1",nativeQuery = true)
-    public Integer legitUser(String email);
+    @Query(value = "select case when exists(select * from users where email=?1) then true else false end",nativeQuery = true)
+    boolean legitUser(String email);
 
-    @Query(value = "select access_token from users where email=?1",nativeQuery = true)
-    public String getAccessToken(String email);
+    @Query(value = "select user_token from users where email=?1",nativeQuery = true)
+    String getUserToken(String email);
 
-    @Query(value = "select count(*) from users where access_token=?1",nativeQuery = true)
-    public Integer checkAccessToken(String accessToken);
+    @Query(value = "select case when exists(select * from users where user_token=?1) then true else false end",nativeQuery = true)
+    boolean checkUserToken(String accessToken);
 
-    @Query(value = "select * from users where access_token=?1",nativeQuery = true)
-    public Users getUserInfo(String accesstoken);
+    @Query(value = "select * from users where user_token=?1",nativeQuery = true)
+    Users getUserInfo(String userToken);
 
-    @Query(value = "delete from users where access_token=:access_token",nativeQuery = true)
-    void deleteUser(@Param("access_token") String access_token);
+    @Query(value = "select is_admin from users where user_token=?1",nativeQuery = true)
+    boolean getUserType(String userToken);
 
-    @Query(value = "select is_admin from users where access_token=?1",nativeQuery = true)
-    public boolean getUserType(String accessToken);
+    @Query(value = "delete from users where email=?1 returning true",nativeQuery = true)
+    boolean deleteUserByEmail(String email);
 
-    @Query(value = "delete from users where email=?1",nativeQuery = true)
-    public void deleteUserByEmail(String email);
+    @Query(value = "select case when exists(select count(*) from users where user_token=?1 and user_id=?2 and type=?3) then true else false end",nativeQuery = true)
+    boolean checkUser(String userToken,Integer user_id,String type);
 
-    @Query(value = "select count(*) from users where access_token=?1 and user_id=?2",nativeQuery = true)
-    public Integer checkUser(String accessToken,Integer user_id);
+    @Query(value = "select user_id from users where user_token=?1",nativeQuery = true)
+    Integer getUserIdFromUserToken(String userToken);
 
-    @Query(value = "select user_id from users where access_token=?1",nativeQuery = true)
-    public Integer getUserIdFromAccessToken(String accessToken);
+    @Query(value = "select * from users where userToken=?1 and is_admin=1",nativeQuery = true)
+    Users checkAdmin(String userToken);
 
-    @Query(value = "select count(*) from users where access_token=?1 and is_admin=1",nativeQuery = true)
-    public Integer checkAdmin(String accessToken);
+    @Query(value = "update users set user_token=?2 where email=?1 returning true",nativeQuery = true)
+    boolean setAccessToken(String email, String userToken);
+
+    @Query(value= "update users set user_token=null where user_token=?1 returning true",nativeQuery = true)
+    boolean logout(String userToken);
+
+    @Query(value = "select * from users where email=?1",nativeQuery = true)
+    Users getUser(String email);
+
+    @Query(value = "select is_admin from users where email=?1",nativeQuery = true)
+    boolean checkAdminUsingEmail(String email);
+
+    @Query(value = "delete from users where user_token=?1 returning *",nativeQuery = true)
+    Users deleteUser(String userToken);
+
+    @Query(value = "select user_token from users where email=?1",nativeQuery = true)
+    String getUserTokenByEmail(String email);
 }

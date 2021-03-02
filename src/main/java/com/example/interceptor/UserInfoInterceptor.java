@@ -1,5 +1,6 @@
 package com.example.interceptor;
 
+import com.example.models.Users;
 import com.example.repository.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -19,13 +20,14 @@ public class UserInfoInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         System.out.println("pre Handle");
         try {
-            String accessToken = request.getHeader("access_token");
-            if(accessToken.equals(null)){
+            String userToken = request.getHeader("user_token");
+            if(userToken.equals(null)){
                 System.out.println("Access Token is empty");
                 response.encodeURL("Access Token is empty");
                 return false;
             }
-            if(usersRepository.checkAccessToken(accessToken).equals(0)){
+            Users users = usersRepository.getUserInfo(userToken);
+            if(users==null){
                 System.out.println("Access Token is not correct");
                 response.encodeURL("Access Token is not correct");
                 return false;
