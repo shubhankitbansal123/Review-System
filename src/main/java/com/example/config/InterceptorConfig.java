@@ -24,8 +24,8 @@ public class InterceptorConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(userInfoInterceptor).addPathPatterns("/userInfo");
-        registry.addInterceptor(adminInterceptor).addPathPatterns("/deleteUser","/deleteUserByAdmin/{email}","/deleteHotel/{id}");
+        registry.addInterceptor(adminInterceptor).addPathPatterns(Arrays.asList("/deleteUserByAdmin","/deleteHotel"));
+        registry.addInterceptor(userInterceptor).addPathPatterns(Arrays.asList("/userInfo","/deleteUser","/createComment","/editComment","/logout","/editComment","/deleteComment","/getComment","/rateHotel"));
         System.out.println("add interceptor Handle");
     }
 }

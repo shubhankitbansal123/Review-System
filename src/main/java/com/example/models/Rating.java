@@ -1,32 +1,45 @@
 package com.example.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
-
+import java.util.HashMap;
+import java.util.Map;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@IdClass(RatingId.class)
-@Table(name = "Rating")
+@Table(name = "Rating", uniqueConstraints = @UniqueConstraint(columnNames = {"user_id","type_id"}))
+@TypeDef(name = "jsonb",typeClass = JsonBinaryType.class)
 public class Rating {
 
     @Id
+    @Column(name = "rating_id")
+    @JsonProperty
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer rating_id;
+
     @Column(name = "user_id")
     @JsonProperty
     private Integer user_id;
 
-    @Id
-    @Column(name = "hotel_id")
+    @Column(name = "type_id")
     @JsonProperty
-    private Integer hotel_id;
+    private Integer type_id;
 
     @JsonProperty
+    private String type;
+
+    @JsonProperty
+    @Type(type = "jsonb")
     @Column(name = "rate")
-    private String rate;
+    private RatingParameter rate = new RatingParameter();
+
 }

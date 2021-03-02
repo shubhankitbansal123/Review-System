@@ -5,6 +5,9 @@ import com.example.models.Comment;
 import com.example.repository.CommentRepository;
 import com.example.repository.HotelRepository;
 import com.example.repository.UsersRepository;
+import com.example.service.CommentService;
+import com.example.service.HotelService;
+import com.example.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,46 +17,50 @@ import java.util.List;
 public class CommentController {
 
     @Autowired
-    private UsersRepository usersRepository;
+    private UserService userService;
 
     @Autowired
-    private HotelRepository hotelRepository;
+    private HotelService hotelService;
 
     @Autowired
-    private CommentRepository commentRepository;
+    private CommentService commentService;
 
     @PostMapping("/createComment")
-    public String createComment(@RequestBody Comment comment,@RequestHeader("access_token") String accessToken){
-        Integer count = usersRepository.checkUser(accessToken,comment.getUser_id());
-        Integer count1 = hotelRepository.getHotelCount(comment.getHotel_id());
-        if(count==0 || count1==0){
-            return "Invalid request";
+    public String createComment(@RequestBody Comment comment,@RequestHeader("user_token") String userToken){
+        if(comment.getType().equalsIgnoreCase("Hotel")) {
+            boolean count1 = hotelService.getHotelCount(comment.getType_id());
+            if (!count1) {
+                return "Invalid request";
+            }
         }
-        commentRepository.save(comment);
+        comment.setUser_id(userService.getUserIdFromUserToken(userToken));
+        commentService.save(comment);
         return "Comment Added Successfully";
     }
 
     @PutMapping("/editComment")
-    public String editComment(@RequestHeader("access_token") String accessToken,@RequestBody Comment comment){
-        Integer count = usersRepository.checkUser(accessToken,comment.getUser_id());
-        Integer count1 = hotelRepository.getHotelCount(comment.getHotel_id());
-        if(count==0 || count1==0){
-            return "Invalid request";
+    public String editComment(@RequestHeader("user_token") String userToken,@RequestParam("user_id") Integer userId,@RequestParam("comment_id") Integer commentId,@RequestBody String comment){
+        boolean check = commentService.checkCommentIdAndUserId(commentId,userId);
+        if(check){
+            commentService.updateComment(commentId,comment);
+            return "Comment Successfully updated";
         }
-        commentRepository.save(comment);
-        return "Comment Edited Successfully";
+        return "Some Information is wrong";
     }
 
-    @DeleteMapping("/deleteComment/{id}")
-    private String deleteComment(@RequestHeader("access_token") String accessToken,@PathVariable Integer id){
-        commentRepository.deleteById(id);
-        return "deleted Successfully";
+    @DeleteMapping("/deleteComment")
+    private String deleteComment(@RequestHeader("user_token") String userToken,@RequestParam("comment_id") Integer commentId,@RequestParam("user_id") Integer userId){
+        boolean check = commentService.checkCommentIdAndUserId(commentId,userId);
+        if(check) {
+            commentService.deleteById(commentId);
+            return "Comment Deleted Successfully";
+        }
+        return "Something is wrong";
     }
 
     @GetMapping("/getComment")
-    private List<String> getComment(@RequestHeader("access_token") String accessToken){
-        Integer userId = usersRepository.getUserIdFromAccessToken(accessToken);
-        List<String> comments = commentRepository.getCommentFromUser_id(userId);
+    private List<String> getComment(@RequestHeader("user_token") String userToken,@RequestParam("user_id") Integer userId){
+        List<String> comments = commentService.getCommentFromUser_id(userId);
         return comments;
     }
 }

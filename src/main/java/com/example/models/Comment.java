@@ -20,9 +20,11 @@ public class Comment {
     @JsonProperty
     private Integer user_id;
     @JsonProperty
-    private Integer hotel_id;
+    private Integer type_id;
     @JsonProperty
     private String comment;
+    @JsonProperty
+    private String type;
     @Id
     @JsonProperty
     @GeneratedValue(strategy = GenerationType.IDENTITY)
