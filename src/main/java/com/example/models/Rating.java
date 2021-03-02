@@ -39,14 +39,7 @@ public class Rating {
 
     @JsonProperty
     @Type(type = "jsonb")
-    @Column(name = "rate", columnDefinition = "jsonb")
-    private Map<String,Integer> rate = new HashMap<>();
-
-    public void addRate(String key,Integer value){
-        rate.put(key,value);
-    }
-
-
-
+    @Column(name = "rate")
+    private RatingParameter rate = new RatingParameter();
 
 }

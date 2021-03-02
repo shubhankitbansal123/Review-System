@@ -49,7 +49,4 @@ public class HotelController {
         commentService.deleteDataOfHotel(id);
         return "Hotel deleted";
     }
-
-
-
 }

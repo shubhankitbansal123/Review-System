@@ -16,6 +16,12 @@ public interface RatingRepository extends JpaRepository<Rating, Integer> {
     void deleteDataOfHotel(Integer id);
 
 
-    @Query(value = "with sourcedata as (select type_id,jsondata.key as key,avg(cast(jsondata.value as int)) as avg from rating,jsonb_each_text(rate) as jsondata group by type_id,jsondata.key) select type_id,json_object_agg(key,avg) as average from sourcedata group by type_id",nativeQuery = true)
+    @Query(value = "with sourcedata as (select type_id,jsondata.key as key,avg(cast(jsondata.value as float)) as avg\n" +
+            "from rating,jsonb_each_text(rate) as jsondata\n" +
+            "where jsondata.value<> '0'\n" +
+            "group by type_id,jsondata.key)\n" +
+            "select type_id,json_object_agg(key,avg) as average\n" +
+            "from sourcedata\n" +
+            "group by type_id",nativeQuery = true)
     RatingAverage ratingAverage();
 }

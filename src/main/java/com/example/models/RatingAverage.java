@@ -8,8 +8,6 @@ import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.Column;
-import java.util.HashMap;
-import java.util.Map;
 
 @Data
 @NoArgsConstructor
@@ -21,9 +19,6 @@ public class RatingAverage {
 
     @Type(type = "jsonb")
     @Column(name = "average", columnDefinition = "jsonb")
-    private Map<String,Float> average = new HashMap<>();
+    private RatingParameter ratingParameter1 = new RatingParameter();
 
-    public void addRate(String key,Float value){
-        average.put(key,value);
-    }
 }
