@@ -1,7 +1,6 @@
 package com.example.controller;
 
-import com.example.models.Hotel;
-import com.example.models.Rating;
+import com.example.models.*;
 import com.example.repository.CommentRepository;
 import com.example.repository.HotelRepository;
 import com.example.repository.RatingRepository;
@@ -13,6 +12,10 @@ import com.example.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 public class HotelController {
@@ -45,8 +48,17 @@ public class HotelController {
             return "Hotel does not exist";
         }
         hotelService.deleteHotel(id);
-        ratingService.deleteDataOfHotel(id);
-        commentService.deleteDataOfHotel(id);
+        boolean count2 = ratingService.getRatingCount(id);
+        if(count2)
+            ratingService.deleteDataOfHotel(id);
+        boolean count3 = commentService.getCommentCount(id);
+        if(count3)
+            commentService.deleteDataOfHotel(id);
         return "Hotel deleted";
+    }
+
+    @GetMapping("/fetchHotelByNameAndLocation")
+    public Hotel fetchHotelByNameAndLocation(@RequestParam("hotel_name") String hotelName,@RequestParam("location") String location){
+        return hotelService.fetchHotelByNameAndLocation(hotelName,location);
     }
 }

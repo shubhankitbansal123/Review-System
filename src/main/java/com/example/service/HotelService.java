@@ -1,7 +1,6 @@
 package com.example.service;
 
 import com.example.models.Hotel;
-import com.example.models.RatingAverage;
 import com.example.repository.HotelRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,7 +9,12 @@ import org.springframework.stereotype.Service;
 public class HotelService {
 
     @Autowired
-    private HotelRepository hotelRepository;
+    private final HotelRepository hotelRepository;
+
+    public HotelService(HotelRepository hotelRepository) {
+        this.hotelRepository = hotelRepository;
+    }
+
 
     public void save(Hotel hotel) {
         hotelRepository.save(hotel);
@@ -24,4 +28,7 @@ public class HotelService {
         hotelRepository.deleteHotel(id);
     }
 
+    public Hotel fetchHotelByNameAndLocation(String hotelName, String location) {
+        return hotelRepository.fetchHotelByNameAndLocation(hotelName,location);
+    }
 }

@@ -6,8 +6,6 @@ import com.example.models.Users;
 
 import com.example.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,46 +20,91 @@ public class UserController {
     @PostMapping("/signUp")// Everybody access and create user with unique emailId
     public String createUser(@RequestBody Users users){
 
-        if(StringUtils.isEmpty(users.getEmail()) || StringUtils.isEmpty(users.getType()) || StringUtils.isEmpty(users.is_admin()) || StringUtils.isEmpty(users.getUsername())) {
+        if(StringUtils.isEmpty(users.getType())){
             return "Some fields are missing";
         }
-        if(!users.getType().equalsIgnoreCase("Hotel") && StringUtils.isEmpty(users.getPassword())){
-            return "For " +users.getType()+" password is necessary";
+        if(users.getType().equalsIgnoreCase("Hotel")){
+            if(StringUtils.isEmpty(users.getEmail())  || StringUtils.isEmpty(users.is_admin()) || StringUtils.isEmpty(users.getUsername())) {
+                return "Some fields are missing";
+            }
+            boolean isUserExist = userService.isUserAlreadyExist(users.getEmail());
+            if(isUserExist){
+                return "User Already Exist";
+            }
+            else {
+                String userToken = UUID.randomUUID().toString();
+                users.setUsertoken(userToken);
+                userService.save(users,userToken);
+                return "Hello " + users.getUsername() + "\nUser Token : " + users.getUsertoken();
+            }
         }
-        boolean isUserExist = userService.isUserAlreadyExist(users.getEmail());
-        if(isUserExist){
-            return "User Already Exist";
-        }
-        else {
-            String userToken = UUID.randomUUID().toString();
-            users.setUsertoken(userToken);
-            userService.save(users,userToken);
-            return "Hello " + users.getUsername() + "\nUser Token : " + users.getUsertoken();
+        else{
+            return "No need to sign up";
         }
     }
 
     @PostMapping("/signIn")  // Everybody signIn with correct emailId and password
     public String signIn(@RequestBody Users users){
-        Users users1 = userService.getUserByEmail(users.getEmail());
-        if(users1==null){
-            return "User does not exist";
+        if(StringUtils.isEmpty(users.getEmail()) && StringUtils.isEmpty(users.getUsername())){
+            return "Some fields are missing";
         }
-        else if(!StringUtils.isEmpty(users1.getUsertoken())){
-            return "User already signed in";
+        if(StringUtils.isEmpty(users.getEmail())){
+            if(StringUtils.isEmpty(users.getPassword())){
+                return "Password is empty";
+            }
+            else {
+                users = userService.getByUsernameAndPassword(users.getUsername(),users.getPassword());
+                if(users==null){
+                    return "User does not exist";
+                }
+                if(users.getType().equalsIgnoreCase("Hotel")){
+                    return "Something is wrong";
+                }
+                if(!StringUtils.isEmpty(users.getUsertoken())){
+                    return users.getUsertoken();
+                }
+                else {
+                    String userToken = UUID.randomUUID().toString();
+                    users.setUsertoken(userToken);
+                    try {
+                        userService.save(users,userToken);
+                    }catch (Exception e){
+                        e.printStackTrace();
+                        return "Update Unsuccessful";
+                    }
+                    return userToken;
+                }
+            }
+        }
+        if(StringUtils.isEmpty(users.getUsername())){
+            users = userService.getUserByEmail(users.getEmail());
+            if(users==null){
+                return "User does not exist";
+            }
+            if(!users.getType().equalsIgnoreCase("Hotel")){
+                return "Something is wrong";
+            }
+            if(!StringUtils.isEmpty(users.getUsertoken())){
+                return users.getUsertoken();
+            }
+            else {
+                String userToken = UUID.randomUUID().toString();
+                users.setUsertoken(userToken);
+                System.out.println(users.toString());
+                try {
+                    userService.save(users,userToken);
+                }catch (Exception e){
+                    e.printStackTrace();
+                    return "Update Unsuccessful";
+                }
+                return userToken;
+            }
         }
         else {
-            String userToken = UUID.randomUUID().toString();
-            users1.setUsertoken(userToken);
-            System.out.println(users1.toString());
-            try {
-                userService.save(users1,userToken);
-            }catch (Exception e){
-                e.printStackTrace();
-                return "Update Unsuccessful";
-            }
-            return userToken;
+            return "Something is wrong";
         }
     }
+
     
     @GetMapping("/userInfo")
     public UserInfo userInfo(@RequestHeader("user_token") String userToken){
