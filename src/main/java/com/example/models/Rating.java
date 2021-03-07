@@ -5,6 +5,7 @@ import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.Value;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
@@ -39,7 +40,16 @@ public class Rating {
 
     @JsonProperty
     @Type(type = "jsonb")
-    @Column(name = "rate")
-    private RatingParameter rate = new RatingParameter();
+    @Column(name = "rate_hotel",columnDefinition = "jsonb")
+    private RatingHotel rateHotel = new RatingHotel();
 
+    @JsonProperty
+    @Type(type = "jsonb")
+    @Column(name = "rate_inventory",columnDefinition = "jsonb")
+    private RatingInventory ratingInventory = new RatingInventory();
+
+    @JsonProperty
+    @Type(type = "jsonb")
+    @Column(name = "rate_ott",columnDefinition = "jsonb")
+    private RatingOtt ratingOtt = new RatingOtt();
 }

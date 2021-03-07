@@ -2,6 +2,7 @@ package com.example.controller;
 
 
 import com.example.models.Comment;
+import com.example.models.Users;
 import com.example.repository.CommentRepository;
 import com.example.repository.HotelRepository;
 import com.example.repository.UsersRepository;
@@ -9,6 +10,7 @@ import com.example.service.CommentService;
 import com.example.service.HotelService;
 import com.example.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,20 +29,46 @@ public class CommentController {
 
     @PostMapping("/createComment")
     public String createComment(@RequestBody Comment comment,@RequestHeader("user_token") String userToken){
-        if(comment.getType().equalsIgnoreCase("Hotel")) {
-            boolean count1 = hotelService.getHotelCount(comment.getType_id());
-            if (!count1) {
+        Users users = userService.getUserInfo(userToken);
+        comment.setUser_id(users.getUser_id());
+        comment.setType(users.getType());
+        if(users.getType().equalsIgnoreCase("Hotel")) {
+            if(StringUtils.isEmpty(comment.getType_id()) || StringUtils.isEmpty(comment.getComment())){
+                return "Some fields are empty";
+            }
+            boolean count = hotelService.getHotelCount(comment.getType_id());
+            if (!count) {
                 return "Invalid request";
             }
+            commentService.save(comment);
+            return "Comment Added Successfully";
         }
-        comment.setUser_id(userService.getUserIdFromUserToken(userToken));
-        commentService.save(comment);
-        return "Comment Added Successfully";
+        else if(users.getType().equalsIgnoreCase("Inventory")){
+            if(StringUtils.isEmpty(comment.getType_id()) || StringUtils.isEmpty(comment.getComment())){
+                return "Some fields are empty";
+            }
+            commentService.save(comment);
+            return "Comment Added Successfully";
+        }
+        else if(users.getType().equalsIgnoreCase("Ott")){
+            if(StringUtils.isEmpty(comment.getType_id()) || StringUtils.isEmpty(comment.getComment())){
+                return "Some fields are empty";
+            }
+            commentService.save(comment);
+            return "Comment Added Successfully";
+        }
+        else {
+            return "Something is wrong";
+        }
     }
 
     @PutMapping("/editComment")
-    public String editComment(@RequestHeader("user_token") String userToken,@RequestParam("user_id") Integer userId,@RequestParam("comment_id") Integer commentId,@RequestBody String comment){
-        boolean check = commentService.checkCommentIdAndUserId(commentId,userId);
+    public String editComment(@RequestHeader("user_token") String userToken,@RequestParam("comment_id") Integer commentId,@RequestBody String comment){
+        Users users = userService.getUserInfo(userToken);
+        if(StringUtils.isEmpty(commentId) || StringUtils.isEmpty(comment)){
+            return "Some fields are empty";
+        }
+        boolean check = commentService.checkCommentIdAndUserId(commentId,users.getUser_id());
         if(check){
             commentService.updateComment(commentId,comment);
             return "Comment Successfully updated";
@@ -49,8 +77,12 @@ public class CommentController {
     }
 
     @DeleteMapping("/deleteComment")
-    private String deleteComment(@RequestHeader("user_token") String userToken,@RequestParam("comment_id") Integer commentId,@RequestParam("user_id") Integer userId){
-        boolean check = commentService.checkCommentIdAndUserId(commentId,userId);
+    private String deleteComment(@RequestHeader("user_token") String userToken,@RequestParam("comment_id") Integer commentId){
+        Users users = userService.getUserInfo(userToken);
+        if(StringUtils.isEmpty(commentId)){
+            return "Some fields are empty";
+        }
+        boolean check = commentService.checkCommentIdAndUserId(commentId,users.getUser_id());
         if(check) {
             commentService.deleteById(commentId);
             return "Comment Deleted Successfully";
@@ -59,8 +91,9 @@ public class CommentController {
     }
 
     @GetMapping("/getComment")
-    private List<String> getComment(@RequestHeader("user_token") String userToken,@RequestParam("user_id") Integer userId){
-        List<String> comments = commentService.getCommentFromUser_id(userId);
+    private List<String> getComment(@RequestHeader("user_token") String userToken){
+        Users users = userService.getUserInfo(userToken);
+        List<String> comments = commentService.getCommentFromUser_id(users.getUser_id());
         return comments;
     }
 }
