@@ -25,7 +25,7 @@ public class AdminInterceptor implements HandlerInterceptor {
         }
         String userToken = request.getHeader("user_token");
         Users users = userService.getUserInfo(userToken);
-        if(users==null || !users.is_admin()){
+        if(users==null || !users.isIsadmin()){
             System.out.println("User does not exist or not admin");
             return false;
         }

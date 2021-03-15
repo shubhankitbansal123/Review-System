@@ -9,43 +9,36 @@ import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
-import java.util.Set;
-
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "Hotel")
 @TypeDef(name = "jsonb",typeClass = JsonBinaryType.class)
-public class Hotel {
-
+@Table(name = "averagerating")
+public class AverageRating {
     @Id
-    @Column(name = "hotelid")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonProperty
-    private Integer hotelid;
+    private Integer averageratingid;
     @JsonProperty
-    private String hotelname;
+    private String name;
     @JsonProperty
-    private String location;
+    private Integer inventoryid=null;
     @JsonProperty
-    private String contact;
+    private Integer ottid=null;
     @JsonProperty
+    private String type;
     @Type(type = "jsonb")
-    @Column(name = "rateaveragehotel",columnDefinition = "jsonb")
-    private RatingHotel rateAverageHotel = new RatingHotel(0,0,0,0,0);
+    @Column(name = "rateaverageinventory",columnDefinition = "jsonb")
     @JsonProperty
-    private float averagerating=0;
+    private RatingInventory rateAverageInventory = new RatingInventory(0,0,0,0,0);
+    @Type(type = "jsonb")
+    @Column(name = "rateaverageott",columnDefinition = "jsonb")
     @JsonProperty
-    private Integer noofpeople=0;
-
-    @OneToMany(cascade = CascadeType.REMOVE)
-    @JoinColumn(name = "hotelid")
-    private Set<Rating> ratings;
-
-    @OneToMany(cascade = CascadeType.REMOVE)
-    @JoinColumn(name = "hotelid")
-    private Set<Comment> comments;
-
+    private RatingOtt rateAverageOtt = new RatingOtt(0,0,0,0,0);
+    @JsonProperty
+    private float averagerate=0;
+    @JsonProperty
+    private Integer numberofpeople=0;
 }

@@ -17,39 +17,50 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "Rating", uniqueConstraints = @UniqueConstraint(columnNames = {"user_id","type_id"}))
+@Table(name = "Rating",uniqueConstraints = {@UniqueConstraint(columnNames = {"userid","hotelid"}),@UniqueConstraint(columnNames = {"userid","inventoryid"}),@UniqueConstraint(columnNames = {"userid","ottid"})})
 @TypeDef(name = "jsonb",typeClass = JsonBinaryType.class)
 public class Rating {
 
     @Id
-    @Column(name = "rating_id")
+    @Column(name = "ratingid")
     @JsonProperty
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer rating_id;
+    private Integer ratingid;
 
-    @Column(name = "user_id")
+    @Column(name = "userid")
     @JsonProperty
-    private Integer user_id;
+    private Integer userid;
 
-    @Column(name = "type_id")
+    @Column(name = "hotelid")
     @JsonProperty
-    private Integer type_id;
+    private Integer hotelid=null;
+
+    @Column(name = "ottid")
+    @JsonProperty
+    private Integer ottid=null;
+
+    @Column(name = "inventoryid")
+    @JsonProperty
+    private Integer inventoryid=null;
 
     @JsonProperty
     private String type;
 
     @JsonProperty
+    private String name;
+
+    @JsonProperty
     @Type(type = "jsonb")
-    @Column(name = "rate_hotel",columnDefinition = "jsonb")
+    @Column(name = "ratehotel",columnDefinition = "jsonb")
     private RatingHotel rateHotel = new RatingHotel();
 
     @JsonProperty
     @Type(type = "jsonb")
-    @Column(name = "rate_inventory",columnDefinition = "jsonb")
+    @Column(name = "rateinventory",columnDefinition = "jsonb")
     private RatingInventory ratingInventory = new RatingInventory();
 
     @JsonProperty
     @Type(type = "jsonb")
-    @Column(name = "rate_ott",columnDefinition = "jsonb")
+    @Column(name = "rateott",columnDefinition = "jsonb")
     private RatingOtt ratingOtt = new RatingOtt();
 }
