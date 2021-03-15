@@ -9,9 +9,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class RatingKafka {
     private String usertoken;
-    private Integer inventoryid=null;
-    private Integer ottid=null;
-    private RatingOtt ratingott=new RatingOtt();
-    private RatingInventory ratingInventory = new RatingInventory();
-    private String name;
+    private Integer itemid=null;
+    private Integer movieid=null;
+    private RatingOtt ratingMovie=new RatingOtt(0,0,0,0,0);
+    private RatingInventory ratingItem = new RatingInventory(0,0,0);
+    private String itemName;
+    private String movieName;
 }

@@ -11,11 +11,19 @@ import org.springframework.web.bind.annotation.RestController;
 public class RateKafkaController {
 
     @Autowired
-    private Producer producer;
+    private final Producer producer;
+
+    public RateKafkaController(Producer producer) {
+        this.producer = producer;
+    }
 
     @PostMapping("/rateKafka")
     public String publish(@RequestBody RatingKafka ratingKafka){
-        producer.publish(ratingKafka);
-        return "Updated";
+        try {
+            producer.publish(ratingKafka);
+            return "Updated";
+        }catch (Exception e){
+            return "Data is not published";
+        }
     }
 }

@@ -32,7 +32,7 @@ public class AverageRating {
     @Type(type = "jsonb")
     @Column(name = "rateaverageinventory",columnDefinition = "jsonb")
     @JsonProperty
-    private RatingInventory rateAverageInventory = new RatingInventory(0,0,0,0,0);
+    private RatingInventory rateAverageInventory = new RatingInventory(0,0,0);
     @Type(type = "jsonb")
     @Column(name = "rateaverageott",columnDefinition = "jsonb")
     @JsonProperty

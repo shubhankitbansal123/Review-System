@@ -22,22 +22,19 @@ public class UserInfoInterceptor implements HandlerInterceptor {
         try {
             String userToken = request.getHeader("user_token");
             if(userToken.equals(null)){
-                System.out.println("Access Token is empty");
-                response.encodeURL("Access Token is empty");
+                response.getWriter().write("Header is empty");
                 return false;
             }
             Users users = usersRepository.getUserInfo(userToken);
             if(users==null){
-                System.out.println("Access Token is not correct");
-                response.encodeURL("Access Token is not correct");
+                response.getWriter().write("User dees not exist");
                 return false;
             }
-            System.out.println("Access Token is correct");
             return true;
         }catch (Exception e){
-            e.printStackTrace();
+            response.getWriter().write("Something is wrong");
+            return false;
         }
-        return true;
     }
 
     @Override

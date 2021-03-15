@@ -20,16 +20,21 @@ public class AdminInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        if(StringUtils.isEmpty(request.getHeader("user_token"))){
-            return false;
+        try {
+            if (StringUtils.isEmpty(request.getHeader("user_token"))) {
+                response.getWriter().write("Header is empty");
+                return false;
+            }
+            String userToken = request.getHeader("user_token");
+            Users users = userService.getUserInfo(userToken);
+            if (users == null || !users.isIsadmin()) {
+                response.getWriter().write("User does not exist or not Admin");
+                return false;
+            }
+            return true;
+        }catch (Exception e){
+            response.getWriter().write("Something is wrong");
+            return true;
         }
-        String userToken = request.getHeader("user_token");
-        Users users = userService.getUserInfo(userToken);
-        if(users==null || !users.isIsadmin()){
-            System.out.println("User does not exist or not admin");
-            return false;
-        }
-        System.out.println("in admin interceptor");
-        return true;
     }
 }

@@ -19,7 +19,7 @@ public class AverageRatingService {
     private AverageRatingRepository averageRatingRepository;
 
     public void updateRatingInventory(RatingInventory ratingInventory,float average, Integer inventoryid) {
-        averageRatingRepository.updateRatingInventory(inventoryid,average,ratingInventory.getA(),ratingInventory.getB(),ratingInventory.getC(),ratingInventory.getD(),ratingInventory.getE());
+        averageRatingRepository.updateRatingInventory(inventoryid,average,ratingInventory.getQuality(),ratingInventory.getAsAdvertised(),ratingInventory.getSatisfaction());
     }
 
     public void updateRatingOtt(RatingOtt ratingOtt, float average, Integer ottid) {

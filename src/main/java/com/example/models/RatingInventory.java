@@ -10,10 +10,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class RatingInventory {
 
-    private float a=1;
-    private float b=1;
-    private float c=1;
-    private float d=1;
-    private float e=1;
+    private float quality=1;
+    private float asAdvertised=1;
+    private float satisfaction=1;
 
 }

@@ -17,17 +17,18 @@ public class Consumer {
     public void consume(RatingKafka ratingKafka){
         System.out.println(ratingKafka);
         Rating rating = new Rating();
-        rating.setInventoryid(ratingKafka.getInventoryid());
-        rating.setRatingOtt(ratingKafka.getRatingott());
-        if(ratingKafka.getInventoryid()!=null) {
+        rating.setRatingInventory(ratingKafka.getRatingItem());
+        rating.setRatingOtt(ratingKafka.getRatingMovie());
+        rating.setInventoryid(ratingKafka.getItemid());
+        rating.setOttid(ratingKafka.getMovieid());
+        if(ratingKafka.getItemid()!=null) {
             rating.setType("Inventory");
+            rating.setName(ratingKafka.getItemName());
         }
-        else if(ratingKafka.getOttid()!=null) {
+        else if(ratingKafka.getMovieid()!=null) {
             rating.setType("Ott");
+            rating.setName(ratingKafka.getMovieName());
         }
-        rating.setRatingInventory(ratingKafka.getRatingInventory());
-        rating.setRatingOtt(ratingKafka.getRatingott());
-        rating.setName(ratingKafka.getName());
         System.out.println(ratingController.rateHotel(rating,ratingKafka.getUsertoken()));
     }
 }
