@@ -25,6 +25,7 @@ public class UserInterceptor implements HandlerInterceptor {
             return false;
         }
         String userToken = request.getHeader("user_token");
+        System.out.println(userToken);
         Users users = userService.getUserInfo(userToken);
 
         if(users==null){

@@ -3,9 +3,10 @@ package com.example.controller;
 
 import com.example.models.UserInfo;
 import com.example.models.Users;
-
 import com.example.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,14 +18,14 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @PostMapping("/signUp")// Everybody access and create user with unique emailId
-    public String createUser(@RequestBody Users users){
 
+    @PostMapping("/signUp")// Everybody access and create user with unique emailId //Done
+    public String createUser(@RequestBody Users users) {
         if(StringUtils.isEmpty(users.getType())){
             return "Some fields are missing";
         }
         if(users.getType().equalsIgnoreCase("Hotel")){
-            if(StringUtils.isEmpty(users.getEmail())  || StringUtils.isEmpty(users.is_admin()) || StringUtils.isEmpty(users.getUsername())) {
+            if(StringUtils.isEmpty(users.getEmail())  || StringUtils.isEmpty(users.isIsadmin()) || StringUtils.isEmpty(users.getUsername())) {
                 return "Some fields are missing";
             }
             boolean isUserExist = userService.isUserAlreadyExist(users.getEmail());
@@ -34,7 +35,7 @@ public class UserController {
             else {
                 String userToken = UUID.randomUUID().toString();
                 users.setUsertoken(userToken);
-                userService.save(users,userToken);
+                userService.save(users, userToken);
                 return "Hello " + users.getUsername() + "\nUser Token : " + users.getUsertoken();
             }
         }
@@ -43,8 +44,9 @@ public class UserController {
         }
     }
 
-    @PostMapping("/signIn")  // Everybody signIn with correct emailId and password
+    @PostMapping("/signIn")  // Everybody signIn with correct emailId and password  //Done
     public String signIn(@RequestBody Users users){
+
         if(StringUtils.isEmpty(users.getEmail()) && StringUtils.isEmpty(users.getUsername())){
             return "Some fields are missing";
         }
@@ -53,12 +55,12 @@ public class UserController {
                 return "Password is empty";
             }
             else {
-                users = userService.getByUsernameAndPassword(users.getUsername(),users.getPassword());
+                users=userService.getByUsernameAndPassword(users.getUsername(),users.getPassword());
                 if(users==null){
                     return "User does not exist";
                 }
                 if(users.getType().equalsIgnoreCase("Hotel")){
-                    return "Something is wrong";
+                    return "User type hotel need to give email for signin";
                 }
                 if(!StringUtils.isEmpty(users.getUsertoken())){
                     return users.getUsertoken();
@@ -66,12 +68,7 @@ public class UserController {
                 else {
                     String userToken = UUID.randomUUID().toString();
                     users.setUsertoken(userToken);
-                    try {
-                        userService.save(users,userToken);
-                    }catch (Exception e){
-                        e.printStackTrace();
-                        return "Update Unsuccessful";
-                    }
+                    userService.save(users,userToken);
                     return userToken;
                 }
             }
@@ -82,7 +79,7 @@ public class UserController {
                 return "User does not exist";
             }
             if(!users.getType().equalsIgnoreCase("Hotel")){
-                return "Something is wrong";
+                return "User type " + users.getType() +"need to give username and password for sign in";
             }
             if(!StringUtils.isEmpty(users.getUsertoken())){
                 return users.getUsertoken();
@@ -91,12 +88,7 @@ public class UserController {
                 String userToken = UUID.randomUUID().toString();
                 users.setUsertoken(userToken);
                 System.out.println(users.toString());
-                try {
-                    userService.save(users,userToken);
-                }catch (Exception e){
-                    e.printStackTrace();
-                    return "Update Unsuccessful";
-                }
+                userService.save(users, userToken);
                 return userToken;
             }
         }
@@ -106,29 +98,22 @@ public class UserController {
     }
 
     
-    @GetMapping("/userInfo")
-    public UserInfo userInfo(@RequestHeader("user_token") String userToken){
+    @GetMapping("/userInfo")  // Done
+    public ResponseEntity<Object> userInfo(@RequestHeader("user_token") String userToken){
         System.out.println("in user info");
         Users users =userService.getUserInfo(userToken);
-        UserInfo userInfo = new UserInfo(users.getEmail(),users.getUsername(),users.is_admin());
-        return userInfo;
+        UserInfo userInfo = new UserInfo(users.getEmail(),users.getUsername(),users.isIsadmin());
+        return new ResponseEntity<>(userInfo, HttpStatus.ACCEPTED);
+//        return userInfo;
     }
 
-    @DeleteMapping("/deleteUser")     // it gives an error
+    @DeleteMapping("/deleteUser")     // it gives an error  //Done
     public String deleteUser(@RequestHeader("user_token") String userToken){
-        try{
-            if(userService.deleteUser(userToken)!=null)
-                return "Delete Successfully";
-            else
-                return "Deleted Unsuccessful";
-        }catch (Exception e){
-            e.printStackTrace();
-            return null;
-        }
-
+        userService.deleteUser(userToken);
+        return "Delete Successfully";
     }
 
-    @DeleteMapping("/deleteUserByAdmin")  // delete user by admin
+    @DeleteMapping("/deleteUserByAdmin")  // delete user by admin //Done
     public String deleteUserByAdmin(@RequestHeader("user_token") String userToken,@RequestParam("email") String email){
         String  userToken1 = userService.getUserTokenByEmail(email);
         if(userToken1==null){
@@ -136,11 +121,13 @@ public class UserController {
         }
         userService.deleteUser(userToken1); // work fine but shown give error for no results were returned by the query
         return "Deleted Successfully";
+
     }
 
-    @DeleteMapping("/logout")
+    @DeleteMapping("/logout")  //Done
     public String logout(@RequestHeader("user_token") String userToken){
         userService.logout(userToken);
         return "Log out Successful";
+
     }
 }
