@@ -17,39 +17,32 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "Rating", uniqueConstraints = @UniqueConstraint(columnNames = {"user_id","type_id"}))
+@Table(name = "Rating",uniqueConstraints = @UniqueConstraint(columnNames = {"userid","typeid","type"}))
 @TypeDef(name = "jsonb",typeClass = JsonBinaryType.class)
 public class Rating {
 
     @Id
-    @Column(name = "rating_id")
+    @Column(name = "ratingid")
     @JsonProperty
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer rating_id;
+    private Integer ratingid;
 
-    @Column(name = "user_id")
+    @Column(name = "userid")
     @JsonProperty
-    private Integer user_id;
+    private Integer userid;
 
-    @Column(name = "type_id")
+    @Column(name = "typeid")
     @JsonProperty
-    private Integer type_id;
+    private Integer typeid=null;
 
     @JsonProperty
     private String type;
 
     @JsonProperty
-    @Type(type = "jsonb")
-    @Column(name = "rate_hotel",columnDefinition = "jsonb")
-    private RatingHotel rateHotel = new RatingHotel();
+    private String name;
 
     @JsonProperty
     @Type(type = "jsonb")
-    @Column(name = "rate_inventory",columnDefinition = "jsonb")
-    private RatingInventory ratingInventory = new RatingInventory();
-
-    @JsonProperty
-    @Type(type = "jsonb")
-    @Column(name = "rate_ott",columnDefinition = "jsonb")
-    private RatingOtt ratingOtt = new RatingOtt();
+    @Column(name = "rating",columnDefinition = "jsonb")
+    private Map<String,Double> rating = new HashMap<>();
 }

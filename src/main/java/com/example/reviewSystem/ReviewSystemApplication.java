@@ -12,7 +12,7 @@ import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 
 @SpringBootApplication
-@ComponentScan(basePackages = {"com.example.controller","com.example.service","com.example.config","com.example.interceptor"})
+@ComponentScan(basePackages = {"com.example.controller","com.example.service","com.example.config","com.example.interceptor","com.example.exception"})
 @EntityScan("com.example.models")
 @EnableJpaRepositories("com.example.repository")
 public class ReviewSystemApplication {

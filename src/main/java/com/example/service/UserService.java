@@ -9,6 +9,8 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @EnableCaching
 public class UserService {
@@ -51,8 +53,8 @@ public class UserService {
         return users;
     }
 
-    public Users getUserByEmail(String email) {
-        return usersRepository.getUser(email);
+    public Users getUserByEmailAndPassword(String email,String password) {
+        return usersRepository.getUserByEmailAndPassword(email,password);
     }
 
     public String getUserTokenByEmail(String email) {

@@ -8,33 +8,36 @@ import org.springframework.data.redis.core.RedisHash;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+
 @Entity
 @Table(name = "users")
+@IdClass(UsersId.class)
 @RedisHash("Users")
 public class Users implements Serializable {
-
     @Id
+    @Column(name = "userid",nullable = false)
+    @JsonProperty("userid")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id",nullable = false)
-    @JsonProperty("user_id")
-    private Integer user_id;
-    @Column(name = "email",unique = true,nullable = false)
+    private Integer userid;
+    @Column(name = "email",unique = true)
     @JsonProperty("email")
     private String email;
-    @Column(name = "username",nullable = false)
+    @Column(name = "username",unique = true)
     @JsonProperty("username")
     private String username;
-    @Column(name = "is_admin",nullable = false)
-    @JsonProperty("is_admin")
-    private boolean is_admin;
-    @Column(name = "user_token",unique = true)
-    @JsonProperty("user_token")
+    @Column(name = "isadmin")
+    @JsonProperty("isadmin")
+    private boolean isadmin;
+    @Column(name = "usertoken",unique = true)
+    @JsonProperty("usertoken")
     private String usertoken;
-    @Column(name = "type",nullable = false)
+    @Id
+    @Column(name = "type")
     @JsonProperty("type")
     private String type;
     @JsonProperty("password")

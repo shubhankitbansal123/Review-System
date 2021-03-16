@@ -11,35 +11,30 @@ import org.hibernate.annotations.TypeDef;
 import javax.persistence.*;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
-
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "Hotel")
 @TypeDef(name = "jsonb",typeClass = JsonBinaryType.class)
-public class Hotel {
-
+@Table(name = "averagerating")
+public class AverageRating {
     @Id
-    @Column(name = "hotelid")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonProperty
-    private Integer hotelid;
+    private Integer averageratingid;
     @JsonProperty
-    private String hotelname;
+    private String name;
     @JsonProperty
-    private String location;
+    private Integer typeid=null;
     @JsonProperty
-    private String contact;
-    @JsonProperty
+    private String type;
     @Type(type = "jsonb")
     @Column(name = "rating",columnDefinition = "jsonb")
+    @JsonProperty
     private Map<String,Double> rating = new HashMap<>();
     @JsonProperty
-    private Double averagerating=0.0;
+    private Double averagerate=0.0;
     @JsonProperty
-    private Integer noofpeople=0;
-
+    private Integer numberofpeople=0;
 }

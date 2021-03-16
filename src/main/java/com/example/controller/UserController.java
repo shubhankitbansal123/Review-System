@@ -3,10 +3,11 @@ package com.example.controller;
 
 import com.example.models.UserInfo;
 import com.example.models.Users;
-
 import com.example.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.StringUtils;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -15,132 +16,137 @@ import java.util.UUID;
 public class UserController {
 
     @Autowired
-    private UserService userService;
+    private final UserService userService;
 
-    @PostMapping("/signUp")// Everybody access and create user with unique emailId
-    public String createUser(@RequestBody Users users){
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
-        if(StringUtils.isEmpty(users.getType())){
-            return "Some fields are missing";
-        }
-        if(users.getType().equalsIgnoreCase("Hotel")){
-            if(StringUtils.isEmpty(users.getEmail())  || StringUtils.isEmpty(users.is_admin()) || StringUtils.isEmpty(users.getUsername())) {
-                return "Some fields are missing";
+    @PostMapping("/signUp")
+    public ResponseEntity<Object> createUser(@RequestBody Users users) {
+        try {
+            if (ObjectUtils.isEmpty(users.getType())) {
+                return new ResponseEntity<>("User type are missing",HttpStatus.NOT_FOUND);
             }
-            boolean isUserExist = userService.isUserAlreadyExist(users.getEmail());
-            if(isUserExist){
-                return "User Already Exist";
+            if (users.getType().equalsIgnoreCase("Hotel")) {
+                if (ObjectUtils.isEmpty(users.getEmail()) || ObjectUtils.isEmpty(users.isIsadmin()) || ObjectUtils.isEmpty(users.getUsername())) {
+                    return new ResponseEntity<>("Some fields are missing",HttpStatus.NOT_FOUND);
+                }
+                boolean isUserExist = userService.isUserAlreadyExist(users.getEmail());
+                if (isUserExist) {
+                    return new ResponseEntity<>("User Already Exist",HttpStatus.CONFLICT);
+                } else {
+                    String userToken = UUID.randomUUID().toString();
+                    users.setUsertoken(userToken);
+                    userService.save(users, userToken);
+                    return new ResponseEntity<>("Hello " + users.getUsername() + "\nUser Token : " + users.getUsertoken(),HttpStatus.ACCEPTED);
+                }
+            } else {
+                return new ResponseEntity<>("No need to sign up",HttpStatus.BAD_REQUEST);
             }
-            else {
-                String userToken = UUID.randomUUID().toString();
-                users.setUsertoken(userToken);
-                userService.save(users,userToken);
-                return "Hello " + users.getUsername() + "\nUser Token : " + users.getUsertoken();
-            }
-        }
-        else{
-            return "No need to sign up";
+        }catch (Exception e){
+            return new ResponseEntity<>("Something is wrong",HttpStatus.BAD_REQUEST);
         }
     }
 
-    @PostMapping("/signIn")  // Everybody signIn with correct emailId and password
-    public String signIn(@RequestBody Users users){
-        if(StringUtils.isEmpty(users.getEmail()) && StringUtils.isEmpty(users.getUsername())){
-            return "Some fields are missing";
-        }
-        if(StringUtils.isEmpty(users.getEmail())){
-            if(StringUtils.isEmpty(users.getPassword())){
-                return "Password is empty";
+    @PostMapping("/signIn")
+    public ResponseEntity<Object> signIn(@RequestBody Users users){
+
+        try {
+            if (ObjectUtils.isEmpty(users.getEmail()) && ObjectUtils.isEmpty(users.getUsername())) {
+                return new ResponseEntity<>("Some fields are missing",HttpStatus.NOT_FOUND);
             }
-            else {
-                users = userService.getByUsernameAndPassword(users.getUsername(),users.getPassword());
-                if(users==null){
-                    return "User does not exist";
+            if(ObjectUtils.isEmpty(users.getPassword())){
+                return new ResponseEntity<>("Password is Empty",HttpStatus.NOT_FOUND);
+            }
+            if (ObjectUtils.isEmpty(users.getEmail())) {
+                users = userService.getByUsernameAndPassword(users.getUsername(), users.getPassword());
+                if (users == null) {
+                    return new ResponseEntity<>("User does not exist",HttpStatus.NOT_FOUND);
                 }
-                if(users.getType().equalsIgnoreCase("Hotel")){
-                    return "Something is wrong";
+                if (users.getType().equalsIgnoreCase("Hotel")) {
+                    return new ResponseEntity<>("User type hotel need to give email and password for sign in",HttpStatus.BAD_REQUEST);
                 }
-                if(!StringUtils.isEmpty(users.getUsertoken())){
-                    return users.getUsertoken();
-                }
-                else {
+                if (!ObjectUtils.isEmpty(users.getUsertoken())) {
+                    return new ResponseEntity<>(users.getUsertoken(),HttpStatus.ACCEPTED);
+                } else {
                     String userToken = UUID.randomUUID().toString();
                     users.setUsertoken(userToken);
-                    try {
-                        userService.save(users,userToken);
-                    }catch (Exception e){
-                        e.printStackTrace();
-                        return "Update Unsuccessful";
-                    }
-                    return userToken;
+                    userService.save(users, userToken);
+                    return new ResponseEntity<>(userToken,HttpStatus.ACCEPTED);
                 }
             }
-        }
-        if(StringUtils.isEmpty(users.getUsername())){
-            users = userService.getUserByEmail(users.getEmail());
-            if(users==null){
-                return "User does not exist";
-            }
-            if(!users.getType().equalsIgnoreCase("Hotel")){
-                return "Something is wrong";
-            }
-            if(!StringUtils.isEmpty(users.getUsertoken())){
-                return users.getUsertoken();
-            }
-            else {
-                String userToken = UUID.randomUUID().toString();
-                users.setUsertoken(userToken);
-                System.out.println(users.toString());
-                try {
-                    userService.save(users,userToken);
-                }catch (Exception e){
-                    e.printStackTrace();
-                    return "Update Unsuccessful";
+            if (ObjectUtils.isEmpty(users.getUsername())) {
+                users = userService.getUserByEmailAndPassword(users.getEmail(),users.getPassword());
+                if (users == null) {
+                    return new ResponseEntity<>("Email or Password is incorrect",HttpStatus.NOT_FOUND);
                 }
-                return userToken;
+                if (!users.getType().equalsIgnoreCase("Hotel")) {
+                    return new ResponseEntity<>("User type " + users.getType() + "need to give username and password for sign in",HttpStatus.BAD_REQUEST);
+                }
+                if (!ObjectUtils.isEmpty(users.getUsertoken())) {
+                    return new ResponseEntity<>(users.getUsertoken(),HttpStatus.ACCEPTED);
+                } else {
+                    String userToken = UUID.randomUUID().toString();
+                    users.setUsertoken(userToken);
+                    System.out.println(users.toString());
+                    userService.save(users, userToken);
+                    return new ResponseEntity<>(userToken,HttpStatus.ACCEPTED);
+                }
+            } else {
+                return new ResponseEntity<>("Some information is Extra",HttpStatus.BAD_REQUEST);
             }
-        }
-        else {
-            return "Something is wrong";
+        }catch (Exception e){
+            return new ResponseEntity<>("Something is wrong",HttpStatus.BAD_REQUEST);
         }
     }
 
     
-    @GetMapping("/userInfo")
-    public UserInfo userInfo(@RequestHeader("user_token") String userToken){
-        System.out.println("in user info");
-        Users users =userService.getUserInfo(userToken);
-        UserInfo userInfo = new UserInfo(users.getEmail(),users.getUsername(),users.is_admin());
-        return userInfo;
-    }
-
-    @DeleteMapping("/deleteUser")     // it gives an error
-    public String deleteUser(@RequestHeader("user_token") String userToken){
-        try{
-            if(userService.deleteUser(userToken)!=null)
-                return "Delete Successfully";
-            else
-                return "Deleted Unsuccessful";
+    @GetMapping("/userInfo")  // Done
+    public ResponseEntity<Object> userInfo(@RequestHeader("user_token") String userToken){
+        try {
+            System.out.println("in user info");
+            Users users = userService.getUserInfo(userToken);
+            UserInfo userInfo = new UserInfo(users.getEmail(), users.getUsername(), users.isIsadmin());
+            return new ResponseEntity<>(userInfo,HttpStatus.ACCEPTED);
         }catch (Exception e){
-            e.printStackTrace();
-            return null;
+            return new ResponseEntity<>("Something is wrong",HttpStatus.NOT_FOUND);
         }
-
     }
 
-    @DeleteMapping("/deleteUserByAdmin")  // delete user by admin
-    public String deleteUserByAdmin(@RequestHeader("user_token") String userToken,@RequestParam("email") String email){
-        String  userToken1 = userService.getUserTokenByEmail(email);
-        if(userToken1==null){
-            return "user does not exist";
+    @DeleteMapping("/deleteUser")
+    public ResponseEntity<Object> deleteUser(@RequestHeader("user_token") String userToken){
+        try {
+            userService.deleteUser(userToken);
+            return new ResponseEntity<>("Delete Successfully",HttpStatus.ACCEPTED);
+        }catch (Exception e){
+            return new ResponseEntity<>("Delete Unsuccessful",HttpStatus.BAD_REQUEST);
         }
-        userService.deleteUser(userToken1); // work fine but shown give error for no results were returned by the query
-        return "Deleted Successfully";
+    }
+
+    @DeleteMapping("/deleteUserByAdmin")
+    public ResponseEntity<Object> deleteUserByAdmin(@RequestHeader("user_token") String userToken,@RequestParam("email") String email){
+        try {
+            String userToken1 = userService.getUserTokenByEmail(email);
+            if (userToken1 == null) {
+                return new ResponseEntity<>("User does not exist",HttpStatus.NOT_FOUND);
+            }
+            userService.deleteUser(userToken1); // work fine but shown give error for no results were returned by the query
+            return new ResponseEntity<>("Delete Successfully",HttpStatus.ACCEPTED);
+        }catch (Exception e){
+            return new ResponseEntity<>("Delete Unsuccessful",HttpStatus.BAD_REQUEST);
+        }
+
     }
 
     @DeleteMapping("/logout")
-    public String logout(@RequestHeader("user_token") String userToken){
-        userService.logout(userToken);
-        return "Log out Successful";
+    public ResponseEntity<Object> logout(@RequestHeader("user_token") String userToken){
+        try {
+            userService.logout(userToken);
+            return new ResponseEntity<>("Logout Successful",HttpStatus.ACCEPTED);
+        }catch (Exception e){
+            return new ResponseEntity<>("Logout Unsuccessful",HttpStatus.BAD_REQUEST);
+        }
+
     }
 }
