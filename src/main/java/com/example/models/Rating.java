@@ -17,7 +17,7 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "Rating",uniqueConstraints = {@UniqueConstraint(columnNames = {"userid","hotelid"}),@UniqueConstraint(columnNames = {"userid","inventoryid"}),@UniqueConstraint(columnNames = {"userid","ottid"})})
+@Table(name = "Rating",uniqueConstraints = @UniqueConstraint(columnNames = {"userid","typeid","type"}))
 @TypeDef(name = "jsonb",typeClass = JsonBinaryType.class)
 public class Rating {
 
@@ -31,17 +31,9 @@ public class Rating {
     @JsonProperty
     private Integer userid;
 
-    @Column(name = "hotelid")
+    @Column(name = "typeid")
     @JsonProperty
-    private Integer hotelid=null;
-
-    @Column(name = "ottid")
-    @JsonProperty
-    private Integer ottid=null;
-
-    @Column(name = "inventoryid")
-    @JsonProperty
-    private Integer inventoryid=null;
+    private Integer typeid=null;
 
     @JsonProperty
     private String type;
@@ -51,16 +43,6 @@ public class Rating {
 
     @JsonProperty
     @Type(type = "jsonb")
-    @Column(name = "ratehotel",columnDefinition = "jsonb")
-    private RatingHotel rateHotel = new RatingHotel();
-
-    @JsonProperty
-    @Type(type = "jsonb")
-    @Column(name = "rateinventory",columnDefinition = "jsonb")
-    private RatingInventory ratingInventory = new RatingInventory();
-
-    @JsonProperty
-    @Type(type = "jsonb")
-    @Column(name = "rateott",columnDefinition = "jsonb")
-    private RatingOtt ratingOtt = new RatingOtt();
+    @Column(name = "rating",columnDefinition = "jsonb")
+    private Map<String,Double> rating = new HashMap<>();
 }

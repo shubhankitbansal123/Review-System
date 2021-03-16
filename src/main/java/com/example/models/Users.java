@@ -13,15 +13,16 @@ import java.util.Set;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+
 @Entity
 @Table(name = "users")
+@IdClass(UsersId.class)
 @RedisHash("Users")
 public class Users implements Serializable {
-
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "userid",nullable = false)
     @JsonProperty("userid")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer userid;
     @Column(name = "email",unique = true)
     @JsonProperty("email")
@@ -35,19 +36,12 @@ public class Users implements Serializable {
     @Column(name = "usertoken",unique = true)
     @JsonProperty("usertoken")
     private String usertoken;
+    @Id
     @Column(name = "type")
     @JsonProperty("type")
     private String type;
     @JsonProperty("password")
     @Column(name = "password")
     private String password;
-
-    @OneToMany
-    @JoinColumn(name = "userid")
-    private Set<Rating> ratings;
-
-    @OneToMany
-    @JoinColumn(name = "userid")
-    private Set<Comment> comments;
 
 }

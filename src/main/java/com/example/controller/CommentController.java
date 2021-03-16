@@ -33,75 +33,81 @@ public class CommentController {
     }
 
     @PostMapping("/createComment")
-    public String createComment(@RequestBody Comment comment,@RequestHeader("user_token") String userToken){
+    public ResponseEntity<Object> createComment(@RequestBody Comment comment,@RequestHeader("user_token") String userToken){
         try {
             Users users = userService.getUserInfo(userToken);
             comment.setUserid(users.getUserid());
+            if(ObjectUtils.isEmpty(comment.getType())){
+                return new ResponseEntity<>("Some fields are empty",HttpStatus.NOT_FOUND);
+            }
+            if(!comment.getType().equalsIgnoreCase(users.getType())){
+                return new ResponseEntity<>("User does not belong to " + comment.getType(),HttpStatus.BAD_REQUEST);
+            }
             comment.setType(users.getType());
             if (users.getType().equalsIgnoreCase("Hotel")) {
-                if (ObjectUtils.isEmpty(comment.getHotelid()) || ObjectUtils.isEmpty(comment.getComment()) || ObjectUtils.isEmpty(comment.getName())) {
-                    return "Some fields are empty";
+                if (ObjectUtils.isEmpty(comment.getTypeid()) || ObjectUtils.isEmpty(comment.getComment()) || ObjectUtils.isEmpty(comment.getName())) {
+                    return new ResponseEntity<>("Some fields are empty",HttpStatus.NOT_FOUND);
                 }
-                boolean count = hotelService.getHotelCount(comment.getHotelid());
+                boolean count = hotelService.getHotelCountWithName(comment.getTypeid(),comment.getName());
                 if (!count) {
-                    return "Invalid request";
+                    return new ResponseEntity<>("Invalid Data",HttpStatus.BAD_REQUEST);
                 }
                 commentService.save(comment);
-                return "Comment Added Successfully";
+                return new ResponseEntity<>("Comment Added Successfully",HttpStatus.ACCEPTED);
 
             } else if (users.getType().equalsIgnoreCase("Inventory")) {
-                if (ObjectUtils.isEmpty(comment.getInventoryid()) || ObjectUtils.isEmpty(comment.getComment())) {
-                    return "Some fields are empty";
+                if (ObjectUtils.isEmpty(comment.getTypeid()) || ObjectUtils.isEmpty(comment.getComment())) {
+                    return new ResponseEntity<>("Some fields are empty",HttpStatus.NOT_FOUND);
                 }
                 commentService.save(comment);
-                return "Comment Added Successfully";
+                return new ResponseEntity<>("Comment Added Successfully",HttpStatus.ACCEPTED);
             } else if (users.getType().equalsIgnoreCase("Ott")) {
-                if (ObjectUtils.isEmpty(comment.getOttid()) || ObjectUtils.isEmpty(comment.getComment())) {
-                    return "Some fields are empty";
+                if (ObjectUtils.isEmpty(comment.getTypeid()) || ObjectUtils.isEmpty(comment.getComment())) {
+                    return new ResponseEntity<>("Some fields are empty",HttpStatus.NOT_FOUND);
                 }
                 commentService.save(comment);
-                return "Comment Added Successfully";
+                return new ResponseEntity<>("Comment Added Successfully",HttpStatus.ACCEPTED);
             } else {
-                return "Something is wrong";
+                return new ResponseEntity<>("Something is wrong",HttpStatus.BAD_REQUEST);
             }
         }catch (Exception e){
-            return "Comment does not added";
+            return new ResponseEntity<>("Comment does not added",HttpStatus.BAD_REQUEST);
         }
     }
 
     @PutMapping("/editComment")
-    public String editComment(@RequestHeader("user_token") String userToken,@RequestParam("comment_id") Integer commentId,@RequestBody String comment){
+    public ResponseEntity<Object> editComment(@RequestHeader("user_token") String userToken,@RequestParam("comment_id") Integer commentId,@RequestBody String comment){
         try {
             Users users = userService.getUserInfo(userToken);
             if (ObjectUtils.isEmpty(commentId) || ObjectUtils.isEmpty(comment)) {
-                return "Some fields are empty";
+                return new ResponseEntity<>("Some fields are empty",HttpStatus.NOT_FOUND);
             }
             boolean check = commentService.checkCommentIdAndUserId(commentId, users.getUserid());
             if (check) {
                 commentService.updateComment(commentId, comment);
-                return "Comment Successfully updated";
+                return new ResponseEntity<>("Comment Added Updated",HttpStatus.ACCEPTED);
             }
-            return "Some Information is wrong";
+            return new ResponseEntity<>("User is not Authorized",HttpStatus.BAD_REQUEST);
         }catch (Exception e){
-            return "Comment edited unsuccessful";
+            return new ResponseEntity<>("Comment Edited Unsuccessful",HttpStatus.BAD_REQUEST);
         }
     }
 
     @DeleteMapping("/deleteComment")
-    private String deleteComment(@RequestHeader("user_token") String userToken,@RequestParam("comment_id") Integer commentId){
+    private ResponseEntity<Object> deleteComment(@RequestHeader("user_token") String userToken,@RequestParam("comment_id") Integer commentId){
         try {
             Users users = userService.getUserInfo(userToken);
             if (ObjectUtils.isEmpty(commentId)) {
-                return "Some fields are empty";
+                return new ResponseEntity<>("Some fields are empty",HttpStatus.NOT_FOUND);
             }
             boolean check = commentService.checkCommentIdAndUserId(commentId, users.getUserid());
             if (check) {
                 commentService.deleteById(commentId);
-                return "Comment Deleted Successfully";
+                return new ResponseEntity<>("Comment Deleted Successfully",HttpStatus.ACCEPTED);
             }
-            return "Something is wrong";
+            return new ResponseEntity<>("User is not Authorized",HttpStatus.BAD_REQUEST);
         }catch (Exception e){
-            return "Comment does not deleted";
+            return new ResponseEntity<>("Comment does not deleted",HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -110,9 +116,24 @@ public class CommentController {
         try {
             Users users = userService.getUserInfo(userToken);
             List<String> comments = commentService.getCommentFromUser_id(users.getUserid());
+            if(comments==null){
+                return new ResponseEntity<>("No comments for this user",HttpStatus.NOT_FOUND);
+            }
             return new ResponseEntity<>(comments,HttpStatus.ACCEPTED);
         }catch (Exception e){
-            return new ResponseEntity<>("Comment does not fetch", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("Comment does not fetch", HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    private ResponseEntity<Object> getCommentForSpecificService(@RequestParam("type") String type,@RequestParam("type_id") String typeId){
+        try {
+            List<String> comments = commentService.getCommentForSpecificService(type,typeId);
+            if(comments==null){
+                return new ResponseEntity<>("No comments for " + type + "with type id " + typeId,HttpStatus.NOT_FOUND);
+            }
+            return new ResponseEntity<>(comments,HttpStatus.ACCEPTED);
+        }catch (Exception e){
+            return new ResponseEntity<>("Comment does not fetch", HttpStatus.BAD_REQUEST);
         }
     }
 }

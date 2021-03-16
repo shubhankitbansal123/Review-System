@@ -11,6 +11,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Table(name = "Comment")
 public class Comment {
 
     @Id
@@ -21,17 +22,9 @@ public class Comment {
     @JsonProperty
     private Integer userid;
 
-    @Column(name = "hotelid")
+    @Column(name = "typeid")
     @JsonProperty
-    private Integer hotelid=null;
-
-    @Column(name = "ottid")
-    @JsonProperty
-    private Integer ottid=null;
-
-    @Column(name = "inventoryid")
-    @JsonProperty
-    private Integer inventoryid=null;
+    private Integer typeid=null;
 
     @JsonProperty
     private String comment;

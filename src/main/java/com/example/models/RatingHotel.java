@@ -10,9 +10,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class RatingHotel {
 
-    private float food=1;
-    private float service=1 ;
-    private float locality=1;
-    private float hygine=1;
-    private float security=1;
+    private Double food = 1.0;
+    private Double locality = 1.0;
+    private Double hygine = 1.0;
+    private Double security = 1.0;
+    private Double service = 1.0;
 }

@@ -53,8 +53,8 @@ public class UserService {
         return users;
     }
 
-    public Users getUserByEmail(String email) {
-        return usersRepository.getUser(email);
+    public Users getUserByEmailAndPassword(String email,String password) {
+        return usersRepository.getUserByEmailAndPassword(email,password);
     }
 
     public String getUserTokenByEmail(String email) {

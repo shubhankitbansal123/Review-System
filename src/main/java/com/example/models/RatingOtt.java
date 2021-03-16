@@ -9,9 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class RatingOtt {
 
-    private float a=1;
-    private float b=1;
-    private float c=1;
-    private float d=1;
-    private float e=1;
+    private Double a=1.0;
+    private Double b=1.0;
+    private Double c=1.0;
 }

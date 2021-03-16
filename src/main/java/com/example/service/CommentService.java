@@ -36,4 +36,8 @@ public class CommentService {
     public List<String> getCommentFromUser_id(Integer userId) {
         return commentRepository.getCommentFromUser_id(userId);
     }
+
+    public List<String> getCommentForSpecificService(String type, String typeId) {
+        return commentRepository.getCommentForSpecificService(type,typeId);
+    }
 }

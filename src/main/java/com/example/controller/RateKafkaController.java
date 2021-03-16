@@ -3,6 +3,8 @@ package com.example.controller;
 import com.example.models.RatingKafka;
 import com.example.service.Producer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,12 +20,12 @@ public class RateKafkaController {
     }
 
     @PostMapping("/rateKafka")
-    public String publish(@RequestBody RatingKafka ratingKafka){
+    public ResponseEntity<Object> publish(@RequestBody RatingKafka ratingKafka){
         try {
             producer.publish(ratingKafka);
-            return "Updated";
+            return new ResponseEntity<>("Data Published Successfully", HttpStatus.ACCEPTED);
         }catch (Exception e){
-            return "Data is not published";
+            return new ResponseEntity<>("Data is not published",HttpStatus.BAD_REQUEST);
         }
     }
 }

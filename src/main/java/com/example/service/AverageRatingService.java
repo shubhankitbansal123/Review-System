@@ -1,8 +1,6 @@
 package com.example.service;
 
 import com.example.models.AverageRating;
-import com.example.models.RatingInventory;
-import com.example.models.RatingOtt;
 import com.example.repository.AverageRatingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -11,6 +9,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class AverageRatingService {
@@ -18,12 +17,12 @@ public class AverageRatingService {
     @Autowired
     private AverageRatingRepository averageRatingRepository;
 
-    public void updateRatingInventory(RatingInventory ratingInventory,float average, Integer inventoryid) {
-        averageRatingRepository.updateRatingInventory(inventoryid,average,ratingInventory.getQuality(),ratingInventory.getAsAdvertised(),ratingInventory.getSatisfaction());
+    public void updateRatingInventory(Map<String,Double> ratingInventory, Double average, Integer inventoryid) {
+        averageRatingRepository.updateRatingInventory(inventoryid,average,ratingInventory.get("quality"),ratingInventory.get("asAdvertised"),ratingInventory.get("satisfaction"));
     }
 
-    public void updateRatingOtt(RatingOtt ratingOtt, float average, Integer ottid) {
-        averageRatingRepository.updateRatingOtt(ottid,average,ratingOtt.getA(),ratingOtt.getB(),ratingOtt.getC(),ratingOtt.getD(),ratingOtt.getE());
+    public void updateRatingOtt(Map<String,Double> ratingOtt, Double average, Integer ottid) {
+        averageRatingRepository.updateRatingOtt(ottid,average,ratingOtt.get("a"),ratingOtt.get("b"),ratingOtt.get("c"),ratingOtt.get("d"),ratingOtt.get("e"));
     }
     public AverageRating getAverageRatingForInventory(Integer inventoryid) {
         return averageRatingRepository.getAverageRatingForInventory(inventoryid);

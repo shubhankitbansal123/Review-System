@@ -21,4 +21,7 @@ public interface CommentRepository extends JpaRepository<Comment,Integer> {
 
     @Query(value = "update comment set comment=?2 where commentid=?1 returning true",nativeQuery = true)
     boolean updateComment(Integer commentId, String comment);
+
+    @Query(value = "select comment from comment where type=?1 and typeid=?2",nativeQuery = true)
+    List<String> getCommentForSpecificService(String type, String typeId);
 }

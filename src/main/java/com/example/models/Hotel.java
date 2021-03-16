@@ -9,6 +9,8 @@ import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 
@@ -33,19 +35,11 @@ public class Hotel {
     private String contact;
     @JsonProperty
     @Type(type = "jsonb")
-    @Column(name = "rateaveragehotel",columnDefinition = "jsonb")
-    private RatingHotel rateAverageHotel = new RatingHotel(0,0,0,0,0);
+    @Column(name = "rating",columnDefinition = "jsonb")
+    private Map<String,Double> rating = new HashMap<>();
     @JsonProperty
-    private float averagerating=0;
+    private Double averagerating=0.0;
     @JsonProperty
     private Integer noofpeople=0;
-
-    @OneToMany(cascade = CascadeType.REMOVE)
-    @JoinColumn(name = "hotelid")
-    private Set<Rating> ratings;
-
-    @OneToMany(cascade = CascadeType.REMOVE)
-    @JoinColumn(name = "hotelid")
-    private Set<Comment> comments;
 
 }

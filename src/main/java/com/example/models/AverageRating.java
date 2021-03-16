@@ -9,6 +9,8 @@ import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
+import java.util.HashMap;
+import java.util.Map;
 
 @Data
 @NoArgsConstructor
@@ -24,21 +26,15 @@ public class AverageRating {
     @JsonProperty
     private String name;
     @JsonProperty
-    private Integer inventoryid=null;
-    @JsonProperty
-    private Integer ottid=null;
+    private Integer typeid=null;
     @JsonProperty
     private String type;
     @Type(type = "jsonb")
-    @Column(name = "rateaverageinventory",columnDefinition = "jsonb")
+    @Column(name = "rating",columnDefinition = "jsonb")
     @JsonProperty
-    private RatingInventory rateAverageInventory = new RatingInventory(0,0,0);
-    @Type(type = "jsonb")
-    @Column(name = "rateaverageott",columnDefinition = "jsonb")
+    private Map<String,Double> rating = new HashMap<>();
     @JsonProperty
-    private RatingOtt rateAverageOtt = new RatingOtt(0,0,0,0,0);
-    @JsonProperty
-    private float averagerate=0;
+    private Double averagerate=0.0;
     @JsonProperty
     private Integer numberofpeople=0;
 }

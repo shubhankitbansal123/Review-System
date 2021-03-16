@@ -19,10 +19,18 @@ public interface HotelRepository extends JpaRepository<Hotel,Integer>, PagingAnd
     Hotel fetchHotelByNameAndLocation(String hotelName, String location);
 
 
-    @Query(value = "update hotel set averagerating=?2,noofpeople=noofpeople+1,rateaveragehotel=json_build_object('food',?3,'service',?4,'locality',?5,'hygine',?6,'security',?7) where hotelid=?1 returning true",nativeQuery = true)
-    boolean updateAverageRating(Integer id,float average,float food,float service,float loyality,float hygine,float security);
+    @Query(value = "update hotel set averagerating=?2,noofpeople=noofpeople+1,rating=json_build_object('food',?3,'service',?4,'locality',?5,'hygine',?6,'security',?7) where hotelid=?1 returning true",nativeQuery = true)
+    boolean updateAverageRating(Integer id,Double average,Double food,Double service,Double loyality,Double hygine,Double security);
 
-    @Query(value = "select * from hotel where hotelid=?1",nativeQuery = true)
-    Hotel fetchHotel(Integer typeid);
+    @Query(value = "select * from hotel where hotelid=?1 and hotelname=?2",nativeQuery = true)
+    Hotel fetchHotel(Integer typeid,String name);
 
+    @Query(value = "select * from hotel where hotelname ilike ?1 order by averagerating desc",nativeQuery = true)
+    List<Hotel> fetchHotelByNameRegex(String value);
+
+    @Query(value = "select * from hotel where location ilike ?1 order by averagerating desc",nativeQuery = true)
+    List<Hotel> fetchHotelByLocationRegex(String value);
+
+    @Query(value = "select case when exists(select * from hotel where hotelid = ?1 and hotelname=?2) then true else false end",nativeQuery = true)
+    boolean getHotelCountWithName(Integer typeid, String name);
 }
