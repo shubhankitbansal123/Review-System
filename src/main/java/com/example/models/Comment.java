@@ -5,28 +5,33 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Table(name = "Comment")
 public class Comment {
 
-
-    @JsonProperty
-    private Integer user_id;
-    @JsonProperty
-    private Integer type_id;
-    @JsonProperty
-    private String comment;
-    @JsonProperty
-    private String type;
     @Id
     @JsonProperty
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer comment_id;
+    private Integer commentid;
+
+    @JsonProperty
+    private Integer userid;
+
+    @Column(name = "typeid")
+    @JsonProperty
+    private Integer typeid=null;
+
+    @JsonProperty
+    private String comment;
+
+    @JsonProperty
+    private String type;
+
+    @JsonProperty
+    private String name;
 }

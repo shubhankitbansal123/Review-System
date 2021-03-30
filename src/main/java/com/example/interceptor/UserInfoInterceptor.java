@@ -2,6 +2,8 @@ package com.example.interceptor;
 
 import com.example.models.Users;
 import com.example.repository.UsersRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -16,28 +18,30 @@ public class UserInfoInterceptor implements HandlerInterceptor {
     @Autowired
     private UsersRepository usersRepository;
 
+    Logger logger = LoggerFactory.getLogger(UserInfoInterceptor.class);
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         System.out.println("pre Handle");
         try {
             String userToken = request.getHeader("user_token");
             if(userToken.equals(null)){
-                System.out.println("Access Token is empty");
-                response.encodeURL("Access Token is empty");
+                logger.error("Header is empty");
+                response.getWriter().write("Header is empty");
                 return false;
             }
             Users users = usersRepository.getUserInfo(userToken);
             if(users==null){
-                System.out.println("Access Token is not correct");
-                response.encodeURL("Access Token is not correct");
+                logger.error("User does not exist");
+                response.getWriter().write("User dees not exist");
                 return false;
             }
-            System.out.println("Access Token is correct");
             return true;
         }catch (Exception e){
-            e.printStackTrace();
+            logger.error("Something is wrong");
+            response.getWriter().write("Something is wrong");
+            return false;
         }
-        return true;
     }
 
     @Override

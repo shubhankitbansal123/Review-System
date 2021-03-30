@@ -17,10 +17,6 @@ public class CommentService {
         this.commentRepository = commentRepository;
     }
 
-    public void deleteDataOfHotel(Integer id) {
-        commentRepository.deleteDataOfHotel(id);
-    }
-
     public void save(Comment comment) {
         commentRepository.save(comment);
     }
@@ -41,15 +37,19 @@ public class CommentService {
         return commentRepository.getCommentFromUser_id(userId);
     }
 
-    public List<String> getCommentFromType_id(Integer hotel_id){
-        return commentRepository.getCommentFromType_id(hotel_id);
+    public List<String> getCommentForSpecificService(String type, Integer typeId) {
+        return commentRepository.getCommentForSpecificService(type,typeId);
     }
 
-    public List<Comment> findCommentByType(String type) {
-        return commentRepository.findCommentByType(type);
+    public boolean checkByHotelTypeId(Integer id) {
+        return commentRepository.checkByHotelTypeId(id);
     }
 
-    public boolean getCommentCount(Integer id) {
-        return commentRepository.getCommentCount(id);
+    public void deleteByHotelTypeId(Integer id) {
+        commentRepository.deleteByHotelTypeId(id);
+    }
+
+    public boolean checkCommentForSpecificService(String type, Integer typeId) {
+        return commentRepository.checkCommentForSpecificService(type,typeId);
     }
 }

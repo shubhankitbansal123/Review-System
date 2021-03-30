@@ -9,9 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class RatingOtt {
 
-    private float a=1;
-    private float b=1;
-    private float c=1;
-    private float d=1;
-    private float e=1;
+    private Double directionAndStory=1.0;
+    private Double actorsPerformance=1.0;
+    private Double productionValues=1.0;
 }

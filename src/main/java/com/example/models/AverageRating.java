@@ -5,7 +5,6 @@ import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Value;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
@@ -17,32 +16,25 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "Rating",uniqueConstraints = @UniqueConstraint(columnNames = {"userid","typeid","type"}))
 @TypeDef(name = "jsonb",typeClass = JsonBinaryType.class)
-public class Rating {
-
+@Table(name = "averagerating")
+public class AverageRating {
     @Id
-    @Column(name = "ratingid")
-    @JsonProperty
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer ratingid;
-
-    @Column(name = "userid")
     @JsonProperty
-    private Integer userid;
-
-    @Column(name = "typeid")
-    @JsonProperty
-    private Integer typeid=null;
-
-    @JsonProperty
-    private String type;
-
+    private Integer averageratingid;
     @JsonProperty
     private String name;
-
     @JsonProperty
+    private Integer typeid=null;
+    @JsonProperty
+    private String type;
     @Type(type = "jsonb")
     @Column(name = "rating",columnDefinition = "jsonb")
+    @JsonProperty
     private Map<String,Double> rating = new HashMap<>();
+    @JsonProperty
+    private Double averagerate=0.0;
+    @JsonProperty
+    private Integer numberofpeople=0;
 }
