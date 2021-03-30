@@ -9,11 +9,11 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface AverageRatingRepository extends JpaRepository<AverageRating,Integer> {
 
-    @Query(value ="update averagerating set averagerate=?2,numberofpeople=numberofpeople+1,rating=json_build_object('quality',?3,'asAdvertised',?4,'satisfaction') where typeid=?1 and type='Inventory' returning true" ,nativeQuery = true)
+    @Query(value ="update averagerating set averagerate=?2,numberofpeople=numberofpeople+1,rating=json_build_object('quality',?3,'asAdvertised',?4,'satisfaction',?5) where typeid=?1 and type='Inventory' returning true" ,nativeQuery = true)
     boolean updateRatingInventory(Integer inventoryid,Double average, Double quality,Double asAdvertised,Double satisfaction);
 
-    @Query(value ="update averagerating set averagerate=?2,numberofpeople=numberofpeople+1,rating=json_build_object('a',?3,'b',?4,'c',?5,'d',?6,'e',?7) where typeid=?1 and type='Ott' returning true" ,nativeQuery = true)
-    boolean updateRatingOtt(Integer ottid,Double average,Double a,Double b, Double c,Double d,Double e);
+    @Query(value ="update averagerating set averagerate=?2,numberofpeople=numberofpeople+1,rating=json_build_object('directionAndStory',?3,'actorsPerformance',?4,'productionValues',?5) where typeid=?1 and type='Ott' returning true" ,nativeQuery = true)
+    boolean updateRatingOtt(Integer ottid,Double average,Double a,Double b, Double c);
 
     Page<AverageRating> findAllByType(String type, Pageable pageable);
 
@@ -22,4 +22,7 @@ public interface AverageRatingRepository extends JpaRepository<AverageRating,Int
 
     @Query(value = "select * from averagerating where typeid=?1 and type='Inventory'",nativeQuery = true)
     AverageRating getAverageRatingForInventory(Integer inventoryid);
+
+    @Query(value = "select * from averagerating where typeid=?1 and type=?2", nativeQuery = true)
+    AverageRating getAverageRatingAndPeople(Integer typeId, String type);
 }

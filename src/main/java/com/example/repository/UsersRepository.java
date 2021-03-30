@@ -33,4 +33,10 @@ public interface UsersRepository extends JpaRepository<Users, UsersId> {
 
     @Query(value = "select * from users where username=?1 and password=?2",nativeQuery = true)
     Users getByUsernameAndPassword(String username, String password);
+
+    @Query(value = "select case when exists(select * from users where username=?1 and type=?2) then true else false end",nativeQuery = true)
+    boolean findByUsernameAndType(String clientName, String type);
+
+    @Query(value = "select usertoken from users where userid=?1 and type=?2",nativeQuery = true)
+    String getUserTokenByUserIdAndType(Integer clientId, String type);
 }

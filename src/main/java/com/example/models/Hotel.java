@@ -32,6 +32,7 @@ public class Hotel {
     @JsonProperty
     private String location;
     @JsonProperty
+    @Column(name = "contact",unique = true)
     private String contact;
     @JsonProperty
     @Type(type = "jsonb")

@@ -64,4 +64,12 @@ public class UserService {
     public Users getByUsernameAndPassword(String username, String password) {
         return usersRepository.getByUsernameAndPassword(username,password);
     }
+
+    public boolean findByUsernameAndType(String clientName, String type) {
+        return usersRepository.findByUsernameAndType(clientName,type);
+    }
+
+    public String getUserTokenByUserIdAndType(Integer clientId, String type) {
+        return usersRepository.getUserTokenByUserIdAndType(clientId,type);
+    }
 }

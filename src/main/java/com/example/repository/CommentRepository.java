@@ -23,5 +23,14 @@ public interface CommentRepository extends JpaRepository<Comment,Integer> {
     boolean updateComment(Integer commentId, String comment);
 
     @Query(value = "select comment from comment where type=?1 and typeid=?2",nativeQuery = true)
-    List<String> getCommentForSpecificService(String type, String typeId);
+    List<String> getCommentForSpecificService(String type, Integer typeId);
+
+    @Query(value = "select case when exists(select * from comment where typeid=?1 and type='Hotel') then true else false end ",nativeQuery = true)
+    boolean checkByHotelTypeId(Integer id);
+
+    @Query(value = "delete from comment where typeid=?1 and type='Hotel' returning true",nativeQuery = true)
+    boolean deleteByHotelTypeId(Integer id);
+
+    @Query(value = "select case when exists(select * from comment where type=?1 and typeid=?2) then true else false end",nativeQuery = true)
+    boolean checkCommentForSpecificService(String type, Integer typeId);
 }

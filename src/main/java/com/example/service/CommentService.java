@@ -37,7 +37,19 @@ public class CommentService {
         return commentRepository.getCommentFromUser_id(userId);
     }
 
-    public List<String> getCommentForSpecificService(String type, String typeId) {
+    public List<String> getCommentForSpecificService(String type, Integer typeId) {
         return commentRepository.getCommentForSpecificService(type,typeId);
+    }
+
+    public boolean checkByHotelTypeId(Integer id) {
+        return commentRepository.checkByHotelTypeId(id);
+    }
+
+    public void deleteByHotelTypeId(Integer id) {
+        commentRepository.deleteByHotelTypeId(id);
+    }
+
+    public boolean checkCommentForSpecificService(String type, Integer typeId) {
+        return commentRepository.checkCommentForSpecificService(type,typeId);
     }
 }

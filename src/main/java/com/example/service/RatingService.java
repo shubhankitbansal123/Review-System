@@ -18,4 +18,12 @@ public class RatingService {
     public void save(Rating rating) {
         ratingRepository.save(rating);
     }
+
+    public boolean checkByHotelTypeId(Integer id) {
+        return ratingRepository.checkByHotelTypeId(id);
+    }
+
+    public void deleteByHotelTypeId(Integer id) {
+        ratingRepository.deleteByHotelTypeId(id);
+    }
 }

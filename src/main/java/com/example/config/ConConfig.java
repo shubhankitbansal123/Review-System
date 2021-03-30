@@ -19,18 +19,18 @@ import java.util.Map;
 public class ConConfig {
 
     @Bean
-    public ConsumerFactory<String, RatingKafka> usersConsumerFactory(){
+    public ConsumerFactory<String, String> usersConsumerFactory(){
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "127.0.0.1:9092");
         props.put(ConsumerConfig.GROUP_ID_CONFIG, "group_json");
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
-        return new DefaultKafkaConsumerFactory<>(props,new StringDeserializer(),new JsonDeserializer<>(RatingKafka.class,true));
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        return new DefaultKafkaConsumerFactory<>(props,new StringDeserializer(),new StringDeserializer());
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, RatingKafka> containerFactory(){
-        ConcurrentKafkaListenerContainerFactory<String, RatingKafka> containerFactory1 = new ConcurrentKafkaListenerContainerFactory();
+    public ConcurrentKafkaListenerContainerFactory<String, String> containerFactory(){
+        ConcurrentKafkaListenerContainerFactory<String, String> containerFactory1 = new ConcurrentKafkaListenerContainerFactory();
         containerFactory1.setConsumerFactory(usersConsumerFactory());
         return containerFactory1;
     }

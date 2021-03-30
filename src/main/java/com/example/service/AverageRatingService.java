@@ -22,7 +22,7 @@ public class AverageRatingService {
     }
 
     public void updateRatingOtt(Map<String,Double> ratingOtt, Double average, Integer ottid) {
-        averageRatingRepository.updateRatingOtt(ottid,average,ratingOtt.get("a"),ratingOtt.get("b"),ratingOtt.get("c"),ratingOtt.get("d"),ratingOtt.get("e"));
+        averageRatingRepository.updateRatingOtt(ottid,average,ratingOtt.get("directionAndStory"),ratingOtt.get("actorsPerformance"),ratingOtt.get("productionValues"));
     }
     public AverageRating getAverageRatingForInventory(Integer inventoryid) {
         return averageRatingRepository.getAverageRatingForInventory(inventoryid);
@@ -36,12 +36,16 @@ public class AverageRatingService {
     }
 
     public List<AverageRating> findInventoryRecordInPagination(Integer pageno, Integer pagesize, String averagerate) {
-        Pageable pageable = PageRequest.of(pageno,pagesize, Sort.by(averagerate));
+        Pageable pageable = PageRequest.of(pageno,pagesize, Sort.by(averagerate).descending());
         return averageRatingRepository.findAllByType("Inventory",pageable).getContent();
     }
 
     public List<AverageRating> findOttRecordInPagination(Integer pageno, Integer pagesize, String averagerate) {
-        Pageable pageable = PageRequest.of(pageno,pagesize, Sort.by(averagerate));
+        Pageable pageable = PageRequest.of(pageno,pagesize, Sort.by(averagerate).descending());
         return averageRatingRepository.findAllByType("Ott",pageable).getContent();
+    }
+
+    public AverageRating getAverageRatingAndPeople(Integer typeId, String type) {
+        return averageRatingRepository.getAverageRatingAndPeople(typeId,type);
     }
 }

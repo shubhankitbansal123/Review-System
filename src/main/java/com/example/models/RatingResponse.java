@@ -7,9 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RatingOtt {
+public class RatingResponse {
 
-    private Double directionAndStory=1.0;
-    private Double actorsPerformance=1.0;
-    private Double productionValues=1.0;
+    private Double averageRating;
+    private Integer numberOfPeople;
 }

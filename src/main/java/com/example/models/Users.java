@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.redis.core.RedisHash;
 
 import javax.persistence.*;
@@ -15,14 +16,13 @@ import java.util.Set;
 @AllArgsConstructor
 
 @Entity
-@Table(name = "users")
+@Table(name = "Users")
 @IdClass(UsersId.class)
 @RedisHash("Users")
 public class Users implements Serializable {
     @Id
     @Column(name = "userid",nullable = false)
     @JsonProperty("userid")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer userid;
     @Column(name = "email",unique = true)
     @JsonProperty("email")
