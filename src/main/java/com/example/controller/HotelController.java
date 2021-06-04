@@ -57,7 +57,7 @@ public class HotelController {
         return "Hotel deleted";
     }
 
-    @GetMapping("/fetchHotelByNameAndLocation")
+    @GetMapping("/fetchHotelByNameAndLocation") 
     public Hotel fetchHotelByNameAndLocation(@RequestParam("hotel_name") String hotelName,@RequestParam("location") String location){
         return hotelService.fetchHotelByNameAndLocation(hotelName,location);
     }
